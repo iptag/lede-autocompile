@@ -37,6 +37,9 @@ git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall package
 # git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall2 package/luci-app-passwall2
 # git_sparse_clone master https://github.com/vernesong/OpenClash luci-app-openclash
 
+# rtp2httpd (IPTV 组播转 HTTP)
+git clone --depth=1 https://github.com/stackia/rtp2httpd package/rtp2httpd
+
 # SmartDNS
 # git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
 # git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
@@ -68,7 +71,6 @@ find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/..\/..\/lang
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/PKG_SOURCE_URL:=@GHREPO/PKG_SOURCE_URL:=https:\/\/github.com/g' {}
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/PKG_SOURCE_URL:=@GHCODELOAD/PKG_SOURCE_URL:=https:\/\/codeload.github.com/g' {}
 
-# rtp2httpd feeds 源已在工作流中添加，此处无需重复
 # 启用 rtp2httpd (如果配置中未启用)
 grep -q 'CONFIG_PACKAGE_luci-app-rtp2httpd=y' .config || echo 'CONFIG_PACKAGE_luci-app-rtp2httpd=y' >> .config
 
@@ -86,10 +88,9 @@ sed -i "s|releases/18.06.9|releases/23.05.6|g" package/lean/default-settings/fil
 mkdir -p files/etc/uci-defaults
 cat > files/etc/uci-defaults/99-clean-opkg-feeds << 'EOFSCRIPT'
 #!/bin/sh
-# 移除腾讯镜像中不存在的第三方源
+# 移除腾讯镜像中不存在的第三方源 (这些包已编译进固件)
 sed -i '/kenzo/d' /etc/opkg/distfeeds.conf 2>/dev/null
 sed -i '/small/d' /etc/opkg/distfeeds.conf 2>/dev/null
-sed -i '/rtp2httpd/d' /etc/opkg/distfeeds.conf 2>/dev/null
 sed -i '/helloworld/d' /etc/opkg/distfeeds.conf 2>/dev/null
 exit 0
 EOFSCRIPT
