@@ -85,6 +85,14 @@ sed -i 's|VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),https://downloads.o
 # 同时修正 zzz-default-settings 中过时的 luci 版本号
 sed -i "s|releases/18.06.9|releases/23.05.6|g" package/lean/default-settings/files/zzz-default-settings
 
+# ============================================
+# 修复 jdcloud_re-sp-01b 缺少 uimage-lzma-loader 导致无法生成 sysupgrade.bin
+# 参考: lenovo_newifi-d1 等同类 MT7621 设备均包含此模板
+# ============================================
+sed -i '/define Device\/jdcloud_re-sp-01b/,/endef/{
+  s/$(Device\/dsa-migration)/$(Device\/dsa-migration)\n  $(Device\/uimage-lzma-loader)/
+}' target/linux/ramips/image/mt7621.mk
+
 mkdir -p files/etc/uci-defaults
 cat > files/etc/uci-defaults/99-clean-opkg-feeds << 'EOFSCRIPT'
 #!/bin/sh
