@@ -37,9 +37,6 @@ git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall package
 # git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall2 package/luci-app-passwall2
 # git_sparse_clone master https://github.com/vernesong/OpenClash luci-app-openclash
 
-# rtp2httpd (IPTV 组播转 HTTP)
-git clone --depth=1 https://github.com/stackia/rtp2httpd package/rtp2httpd
-
 # SmartDNS
 # git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
 # git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
@@ -70,9 +67,6 @@ find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/..\/..\/luci
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/..\/..\/lang\/golang\/golang-package.mk/$(TOPDIR)\/feeds\/packages\/lang\/golang\/golang-package.mk/g' {}
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/PKG_SOURCE_URL:=@GHREPO/PKG_SOURCE_URL:=https:\/\/github.com/g' {}
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/PKG_SOURCE_URL:=@GHCODELOAD/PKG_SOURCE_URL:=https:\/\/codeload.github.com/g' {}
-
-# 启用 rtp2httpd (如果配置中未启用)
-grep -q 'CONFIG_PACKAGE_luci-app-rtp2httpd=y' .config || echo 'CONFIG_PACKAGE_luci-app-rtp2httpd=y' >> .config
 
 # ============================================
 # 修正 opkg 源版本号 (LEDE 实际基于 OpenWrt 23.05 分支)
