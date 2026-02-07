@@ -40,8 +40,7 @@
 针对 32MB Flash 优化，默认启用：
 - LuCI 管理界面
 - Passwall
-- UPnP / WoL
-- Samba4
+- UPnP
 - 自动重启
 
 ## 自定义编译
