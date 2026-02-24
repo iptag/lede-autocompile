@@ -149,13 +149,33 @@ jobs:
         # 重新安装 feeds 以确保新增包被识别
         ./scripts/feeds install -a
 
+    - name: Cache DL Package
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.OPENWRT_PATH }}/dl
+        key: dl-x86_64-${{ hashFiles('configs/x86_64.config', 'configs/pkg.config', 'configs/drivers.config') }}
+        restore-keys: |
+          dl-x86_64-
+
     - name: Download DL Package
       run: |
         cd $OPENWRT_PATH
         make defconfig
-        make download -j16
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
+        # 首轮：16线程并发下载
+        make download -j16 || true
+        # 清理不完整文件(<1KB)
+        find dl -size -1024c -exec rm -f {} \; 2>/dev/null || true
+        # 重试轮：单线程逐个下载失败的包，最多重试3次
+        for i in 1 2 3; do
+          echo "=== Download retry round $i ==="
+          if make download -j1 V=s 2>&1 | tee /tmp/dl_retry.log; then
+            echo "All downloads succeeded."
+            break
+          fi
+          find dl -size -1024c -exec rm -f {} \; 2>/dev/null || true
+          [ "$i" -eq 3 ] && { echo "Download failed after 3 retries"; exit 1; }
+          sleep 10
+        done
 
     - name: Compile Firmware
       id: compile
